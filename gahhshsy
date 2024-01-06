@@ -1,0 +1,123 @@
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="YourPage.aspx.cs" Inherits="YourNamespace.YourPage" %>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>File Explorer</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script type="text/javascript">
+        function refreshExplorer() {
+            $.ajax({
+                type: "POST",
+                url: "YourPage.aspx/GetDirectoryContent",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    $('#fileExplorer').html(data.d);
+                }
+            });
+        }
+
+        function createFile() {
+            var fileName = prompt("Enter file name:");
+            if (fileName) {
+                $.ajax({
+                    type: "POST",
+                    url: "YourPage.aspx/CreateFile",
+                    data: JSON.stringify({ fileName: fileName }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function () {
+                        refreshExplorer();
+                    }
+                });
+            }
+        }
+
+        function deleteFile(fileName) {
+            if (confirm("Are you sure you want to delete " + fileName + "?")) {
+                $.ajax({
+                    type: "POST",
+                    url: "YourPage.aspx/DeleteFile",
+                    data: JSON.stringify({ fileName: fileName }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function () {
+                        refreshExplorer();
+                    }
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <button type="button" onclick="createFile()">Create New File</button>
+            <div id="fileExplorer">
+                <!-- File explorer content will be loaded here -->
+            </div>
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+
+using System;
+using System.IO;
+using System.Web.Services;
+
+public partial class YourPage : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            // Initial load of file explorer
+            GetDirectoryContent();
+        }
+    }
+
+    [WebMethod]
+    public static string GetDirectoryContent()
+    {
+        string directoryPath = @"D:\ow"; // Specify your directory path
+        DirectoryInfo directoryInfo = new DirectoryInfo(directoryPath);
+        FileInfo[] files = directoryInfo.GetFiles();
+
+        string result = "<ul>";
+        foreach (FileInfo file in files)
+        {
+            result += $"<li>{file.Name} <button onclick='deleteFile(\"{file.Name}\")'>Delete</button></li>";
+        }
+        result += "</ul>";
+
+        return result;
+    }
+
+    [WebMethod]
+    public static void CreateFile(string fileName)
+    {
+        string directoryPath = @"D:\ow"; // Specify your directory path
+        string filePath = Path.Combine(directoryPath, fileName);
+
+        using (FileStream fs = File.Create(filePath))
+        {
+            // Optionally, you can write content to the file here
+        }
+    }
+
+    [WebMethod]
+    public static void DeleteFile(string fileName)
+    {
+        string directoryPath = @"D:\ow"; // Specify your directory path
+        string filePath = Path.Combine(directoryPath, fileName);
+
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+    }
+}
