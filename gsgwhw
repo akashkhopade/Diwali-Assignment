@@ -1,0 +1,65 @@
+using System;
+using System.IO;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+
+public partial class YourPage : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        // Your logic and controls initialization
+    }
+
+    protected void GeneratePDFButton_Click(object sender, EventArgs e)
+    {
+        // Specify the file path where you want to save the PDF
+        string filePath = Server.MapPath("~/GeneratedFiles/GeneratedPDF.pdf");
+
+        // Call the method to generate the PDF
+        GeneratePDF(filePath);
+
+        // Provide the PDF file as a download link or perform other actions as needed
+        Response.ContentType = "application/pdf";
+        Response.AppendHeader("Content-Disposition", "attachment; filename=GeneratedPDF.pdf");
+        Response.TransmitFile(filePath);
+        Response.End();
+    }
+
+    private void GeneratePDF(string filePath)
+    {
+        using (var writer = new PdfWriter(filePath))
+        {
+            using (var pdf = new PdfDocument(writer))
+            {
+                var document = new Document(pdf);
+
+                // Title
+                AddTextRow(document, "ACC name", "Some space", "Real date");
+
+                // Add blank space
+                document.Add(new Paragraph(" "));
+
+                // Content rows (Assuming you have some data to fill)
+                for (int i = 1; i <= 6; i++)
+                {
+                    AddTextRow(document, "Row " + i, "Data " + i, DateTime.Now.ToShortDateString());
+                }
+            }
+        }
+    }
+
+    private void AddTextRow(Document document, string col1, string col2, string col3)
+    {
+        // Create a table with 3 columns
+        var table = new Table(3);
+
+        // Add cells with your data
+        table.AddCell(col1);
+        table.AddCell(col2);
+        table.AddCell(col3);
+
+        // Add the table to the document
+        document.Add(table);
+    }
+}
