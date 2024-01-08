@@ -1,0 +1,32 @@
+<script>
+    $(document).ready(function () {
+        $(".autocomplete").on('input', function () {
+            var inputText = $(this).val();
+            if (inputText.length >= 3) {
+                // You may use Ajax to get suggestions from server based on inputText
+                var suggestions = ["Suggestion1", "Suggestion2", "Suggestion3"];
+
+                // Display suggestions
+                displaySuggestions(suggestions);
+            } else {
+                // Clear suggestions if input length is less than 3
+                $("#suggestions").empty();
+            }
+        });
+
+        function displaySuggestions(suggestions) {
+            var suggestionsDiv = $("#suggestions");
+            suggestionsDiv.empty();
+
+            $.each(suggestions, function (index, suggestion) {
+                suggestionsDiv.append("<div class='suggestion'>" + suggestion + "</div>");
+            });
+
+            $(".suggestion").click(function () {
+                var selectedSuggestion = $(this).text();
+                $(".autocomplete").val(selectedSuggestion);
+                suggestionsDiv.empty();
+            });
+        }
+    });
+</script>
