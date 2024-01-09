@@ -1,0 +1,93 @@
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="GeneratePDF.aspx.cs" Inherits="YourNamespace.GeneratePDF" %>
+<%@ Import Namespace="iText.Kernel.Pdf" %>
+<%@ Import Namespace="iText.Layout" %>
+<%@ Import Namespace="iText.Layout.Element" %>
+<%@ Import Namespace="System.IO" %>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Generate PDF</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <% 
+                // Call the method to generate the PDF
+                GeneratePdf();
+            %>
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using System;
+using System.IO;
+
+namespace YourNamespace
+{
+    public partial class GeneratePDF : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // This page doesn't require user interaction, so we generate the PDF on page load.
+        }
+
+        protected void GeneratePdf()
+        {
+            // Create a MemoryStream to hold the PDF
+            using (MemoryStream stream = new MemoryStream())
+            {
+                // Initialize PDF writer
+                using (PdfWriter writer = new PdfWriter(stream))
+                {
+                    using (PdfDocument pdf = new PdfDocument(writer))
+                    {
+                        Document document = new Document(pdf);
+
+                        // Add content to the PDF
+                        document.Add(new Paragraph("A/c name\t\t\tit's data"));
+                        document.Add(new Paragraph("Address\t\t\t\tit's data"));
+                        document.Add(new Paragraph($"From {date1} to {date2}\t\t\tPage No: {pageNumber}"));
+
+                        // Add tabular format
+                        Table table = new Table(6).UseAllAvailableWidth();
+                        table.AddHeaderCell("Date");
+                        table.AddHeaderCell("Particular");
+                        table.AddHeaderCell("Cheque No");
+                        table.AddHeaderCell("Debit");
+                        table.AddHeaderCell("Credit");
+                        table.AddHeaderCell("Balance");
+
+                        // Add data rows to the table (replace with your data)
+                        table.AddCell("2024-01-01");
+                        table.AddCell("Transaction 1");
+                        table.AddCell("12345");
+                        table.AddCell("100.00");
+                        table.AddCell("0.00");
+                        table.AddCell("100.00");
+
+                        // Add more rows as needed
+
+                        document.Add(table);
+
+                        // Print date
+                        document.Add(new Paragraph($"Print date: {DateTime.Now}"));
+
+                        // Close the document
+                        document.Close();
+                    }
+                }
+
+                // Save the PDF to a file or send it as a response
+                File.WriteAllBytes("GeneratedPDF.pdf", stream.ToArray());
+            }
+        }
+    }
+}
