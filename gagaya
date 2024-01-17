@@ -1,0 +1,73 @@
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="BackupPage.aspx.cs" Inherits="YourNamespace.BackupPage" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Create Database Backup</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <h2>Create Database Backup</h2>
+            <label for="txtDatabaseName">Enter Database Name:</label>
+            <asp:TextBox ID="txtDatabaseName" runat="server"></asp:TextBox>
+            <asp:Button ID="btnSubmit" runat="server" Text="Submit" OnClick="btnSubmit_Click" />
+            <br />
+            <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+using System;
+using System.Data.SqlClient;
+using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Smo;
+
+namespace YourNamespace
+{
+    public partial class BackupPage : System.Web.UI.Page
+    {
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            // Call your method to create a database backup
+            CreateDatabaseBackup(txtDatabaseName.Text.Trim(), "127.0.0.1", 1433, "C:\\Path\\To\\Your\\Backup\\Folder");
+        }
+
+        private void CreateDatabaseBackup(string databaseName, string serverIp, int serverPort, string backupFolderPath)
+        {
+            try
+            {
+                // Connect to the SQL Server instance using IP address and port
+                ServerConnection serverConnection = new ServerConnection(serverIp, serverPort);
+                Server server = new Server(serverConnection);
+
+                // Create a new backup device
+                BackupDeviceItem backupDevice = new BackupDeviceItem($"{backupFolderPath}\\{databaseName}_Backup.bak", DeviceType.File);
+
+                // Create a new backup
+                Backup backup = new Backup
+                {
+                    Action = BackupActionType.Database,
+                    Database = databaseName
+                };
+
+                backup.Devices.Add(backupDevice);
+
+                // Perform the backup
+                backup.SqlBackup(server);
+
+                // Display success message
+                lblMessage.Text = "Backup created successfully!";
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions and display error message
+                lblMessage.Text = "Error creating backup: " + ex.Message;
+            }
+        }
+    }
+}
