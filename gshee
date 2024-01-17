@@ -1,0 +1,74 @@
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SearchPage.aspx.cs" Inherits="YourNamespace.SearchPage" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Text Search Page</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <h2>Text Search</h2>
+            <label for="txtSearch">Enter Text:</label>
+            <asp:TextBox ID="txtSearch" runat="server"></asp:TextBox>
+            <asp:Button ID="btnSearch" runat="server" Text="Search" OnClick="btnSearch_Click" />
+            <br />
+            <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+            <br />
+            <!-- Display search results as needed -->
+            <asp:GridView ID="GridViewResults" runat="server" AutoGenerateColumns="True"></asp:GridView>
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+using System;
+using System.Data.SqlClient;
+using System.Web.UI.WebControls;
+
+namespace YourNamespace
+{
+    public partial class SearchPage : System.Web.UI.Page
+    {
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            // Call your method to perform the search
+            SearchText(txtSearch.Text.Trim());
+        }
+
+        private void SearchText(string searchText)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection("YourConnectionString"))
+                {
+                    connection.Open();
+
+                    // Adjust "YourTable" and "YourColumn" based on your actual table and column names
+                    string query = "SELECT YourColumn FROM YourTable WHERE SUBSTRING(YourColumn, 6, LEN(YourColumn)) LIKE @SearchText";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        // Add a parameter to prevent SQL injection
+                        command.Parameters.AddWithValue("@SearchText", "%" + searchText + "%");
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            // Bind search results to GridView
+                            GridViewResults.DataSource = reader;
+                            GridViewResults.DataBind();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                lblMessage.Text = "Error searching text: " + ex.Message;
+            }
+        }
+    }
+}
