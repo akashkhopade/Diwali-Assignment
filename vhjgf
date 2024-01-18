@@ -1,0 +1,88 @@
+using System;
+using System.IO;
+using System.Web;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Renderer;
+
+namespace BankStatementGenerator
+{
+    public partial class BankStatement : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // Create a MemoryStream to store the PDF content
+            using (MemoryStream stream = new MemoryStream())
+            {
+                // Create a PdfWriter object
+                using (PdfWriter writer = new PdfWriter(stream))
+                {
+                    // Create a PdfDocument object
+                    using (PdfDocument pdf = new PdfDocument(writer))
+                    {
+                        // Create a Document object
+                        Document document = new Document(pdf);
+
+                        // Set the left margin to ensure alignment
+                        document.SetMargins(50, 36, 36, 36);
+
+                        // Add header details
+                        AddAlignedText(document, "A/c name:", "tiruit technology");
+                        AddAlignedText(document, "Address:", "hehwhw jsjwhwhw\n          hwhw ueieh");
+                        AddAlignedText(document, "Ac details:", "tirumala uat");
+                        AddAlignedText(document, "CBS ac no:", "62652266");
+                        AddAlignedText(document, "IFSC code:", "srcb00062");
+                        AddAlignedText(document, "Micr code:", "755477");
+                        AddAlignedText(document, $"From Date: 2024-07-01 to Date: 2023-02-05");
+                        AddAlignedText(document, $"Print date: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+
+                        // Add table header
+                        document.Add(new Paragraph("\n----------------------------------------------"));
+                        document.Add(new Paragraph("Date\tParticulars\tchqno\tdebit\tcredit\tbal"));
+                        document.Add(new Paragraph("----------------------------------------------"));
+
+                        // Add transaction details (replace with your actual data)
+                        AddAlignedText(document, "Aug\tbyopen\t0\t662.00\t6527");
+                        // Add more transactions as needed
+
+                        // Save the PDF to the server or send it to the client
+                        string fileName = "BankStatement.pdf";
+                        File.WriteAllBytes(Server.MapPath(fileName), stream.ToArray());
+
+                        // Provide the PDF download link to the client
+                        Response.ContentType = "application/pdf";
+                        Response.AppendHeader("Content-Disposition", $"attachment; filename={fileName}");
+                        Response.TransmitFile(Server.MapPath(fileName));
+                        Response.End();
+                    }
+                }
+            }
+        }
+
+        // Helper method to add aligned text in the PDF
+        private void AddAlignedText(Document document, string leftText, string rightText)
+        {
+            float leftWidth = 100f; // Adjust this value based on your layout
+            float rightWidth = 200f; // Adjust this value based on your layout
+
+            // Create a PdfCanvas object
+            PdfCanvas canvas = new PdfCanvas(document.GetPdfDocument().AddNewPage());
+
+            // Set the font and size
+            canvas.SetFontAndSize(PdfFontFactory.CreateFont(), 12);
+
+            // Add left text
+            canvas.BeginText()
+                .MoveText(leftWidth, canvas.GetPageSize().GetTop() - 36) // Adjust the Y-coordinate based on your layout
+                .ShowText(leftText)
+                .EndText();
+
+            // Add right text
+            canvas.BeginText()
+                .MoveText(leftWidth + rightWidth, canvas.GetPageSize().GetTop() - 36) // Adjust the Y-coordinate based on your layout
+                .ShowText(rightText)
+                .EndText();
+        }
+    }
+}
