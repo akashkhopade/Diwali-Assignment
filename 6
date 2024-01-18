@@ -1,0 +1,27 @@
+// Helper method to add transaction details using a Table
+private void AddTransactionDetails(Document document, string date, string particulars, string chqno, string debit, string credit)
+{
+    // Assuming these are your desired column widths
+    float dateWidth = 60;
+    float particularsWidth = 100;
+    float chqnoWidth = 40;
+    float debitWidth = 40;
+    float creditWidth = 40;
+
+    float lineHeight = 12; // Adjust as needed for line spacing
+
+    Table transactionTable = new Table(new float[] { dateWidth, particularsWidth, chqnoWidth, debitWidth, creditWidth });
+    transactionTable.SetWidth(UnitValue.CreatePercentValue(100));
+    transactionTable.SetBorder(Border.NO_BORDER);
+
+    transactionTable.AddCell(new Cell().Add(new Paragraph(date)).SetBorder(Border.NO_BORDER));
+    transactionTable.AddCell(new Cell().Add(new Paragraph(particulars)).SetBorder(Border.NO_BORDER));
+    transactionTable.AddCell(new Cell().Add(new Paragraph(chqno)).SetBorder(Border.NO_BORDER));
+    transactionTable.AddCell(new Cell().Add(new Paragraph(debit)).SetBorder(Border.NO_BORDER));
+    transactionTable.AddCell(new Cell().Add(new Paragraph(credit)).SetBorder(Border.NO_BORDER));
+
+    // Adjust the line spacing
+    transactionTable.SetFixedLeading(lineHeight * 1.2f); // Adjust the multiplier as needed
+
+    document.Add(transactionTable);
+}
