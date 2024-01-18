@@ -1,0 +1,37 @@
+// Helper method to add table header
+private void AddTableHeader(Document document)
+{
+    Table headerTable = new Table(5); // 5 columns
+    headerTable.SetWidthPercent(100);
+
+    // Set a fixed width for each column
+    float[] columnWidths = { 80, 120, 80, 80, 80 };
+    headerTable.SetWidth(columnWidths);
+
+    headerTable.AddCell("Date");
+    headerTable.AddCell("Particulars");
+    headerTable.AddCell("chqno");
+    headerTable.AddCell("debit");
+    headerTable.AddCell("credit");
+
+    document.Add(headerTable);
+}
+
+// Helper method to add transaction details
+private void AddTransactionDetails(Document document, string date, string particulars, string chqno, string debit, string credit)
+{
+    Table transactionTable = new Table(5); // 5 columns
+    transactionTable.SetWidthPercent(100);
+
+    // Set a fixed width for each column
+    float[] columnWidths = { 80, 120, 80, 80, 80 };
+    transactionTable.SetWidth(columnWidths);
+
+    transactionTable.AddCell(date);
+    transactionTable.AddCell(particulars);
+    transactionTable.AddCell(chqno);
+    transactionTable.AddCell(debit);
+    transactionTable.AddCell(credit);
+
+    document.Add(transactionTable);
+}
