@@ -1,0 +1,26 @@
+// Helper method to add transaction details horizontally
+private void AddTransactionDetails(Document document, string date, string particulars, string chqno, string debit, string credit)
+{
+    // Assuming these are your desired column widths
+    float dateWidth = 60;
+    float particularsWidth = 100;
+    float chqnoWidth = 40;
+    float debitWidth = 40;
+    float creditWidth = 40;
+
+    float lineHeight = 12; // Adjust as needed for line spacing
+
+    Table transactionTable = new Table(5);
+    transactionTable.SetWidth(UnitValue.CreatePercentValue(100));
+
+    transactionTable.AddCell(new Cell().Add(new Paragraph($"{date.PadRight(15)}").SetWidth(dateWidth)));
+    transactionTable.AddCell(new Cell().Add(new Paragraph($"{particulars.PadRight(25)}").SetWidth(particularsWidth)));
+    transactionTable.AddCell(new Cell().Add(new Paragraph($"{chqno.PadRight(10)}").SetWidth(chqnoWidth)));
+    transactionTable.AddCell(new Cell().Add(new Paragraph($"{debit.PadRight(10)}").SetWidth(debitWidth)));
+    transactionTable.AddCell(new Cell().Add(new Paragraph($"{credit.PadRight(10)}").SetWidth(creditWidth)));
+
+    // Adjust the line spacing
+    transactionTable.SetFixedLeading(lineHeight * 1.2f); // Adjust the multiplier as needed
+
+    document.Add(transactionTable);
+}
