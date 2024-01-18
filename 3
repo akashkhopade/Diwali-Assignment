@@ -1,0 +1,113 @@
+using System;
+using System.IO;
+using System.Web;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
+
+namespace BankStatementGenerator
+{
+    public partial class BankStatement : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // Create a MemoryStream to store the PDF content
+            using (MemoryStream stream = new MemoryStream())
+            {
+                // Create a PdfWriter object
+                using (PdfWriter writer = new PdfWriter(stream))
+                {
+                    // Create a PdfDocument object
+                    using (PdfDocument pdf = new PdfDocument(writer))
+                    {
+                        // Create a Document object
+                        Document document = new Document(pdf);
+
+                        // Set the left margin to ensure alignment
+                        document.SetMargins(50, 36, 36, 36);
+
+                        // Add header details
+                        AddHeaderDetails(document, "A/c name:", "tiruit technology");
+                        AddHeaderDetails(document, "Address:", "hehwhw jsjwhwhw\n          hwhw ueieh");
+                        AddHeaderDetails(document, "Ac details:", "tirumala uat");
+                        AddHeaderDetails(document, "CBS ac no:", "62652266");
+                        AddHeaderDetails(document, "IFSC code:", "srcb00062");
+                        AddHeaderDetails(document, "Micr code:", "755477");
+                        AddHeaderDetails(document, $"From Date: 2024-07-01 to Date: 2023-02-05");
+                        AddHeaderDetails(document, $"Print date: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+
+                        // Add a line separator
+                        AddLineSeparator(document);
+
+                        // Add table header
+                        AddTableHeader(document);
+
+                        // Add transaction details (replace with your actual data)
+                        AddTransactionDetails(document, "Aug", "byopen", "0", "662.00", "6527");
+                        // Add more transactions as needed
+
+                        // Save the PDF to a folder on the server
+                        string filePath = Server.MapPath("~/PDFs/BankStatement.pdf");
+                        document.Close();
+                        File.WriteAllBytes(filePath, stream.ToArray());
+
+                        // Provide the PDF download link to the client
+                        Response.ContentType = "application/pdf";
+                        Response.AppendHeader("Content-Disposition", $"attachment; filename=BankStatement.pdf");
+                        Response.TransmitFile(filePath);
+                        Response.End();
+                    }
+                }
+            }
+        }
+
+        // Helper method to add header details with consistent starting point
+        private void AddHeaderDetails(Document document, string label, string value)
+        {
+            Paragraph paragraph = new Paragraph()
+                .Add(new Text($"{label}").SetBold().SetFontSize(12))
+                .Add(new Text($" {value}").SetFontSize(12));
+
+            document.Add(paragraph);
+        }
+
+        // Helper method to add a line separator
+        private void AddLineSeparator(Document document)
+        {
+            document.Add(new LineSeparator(new SolidLine(1)).SetMarginTop(10).SetMarginBottom(10));
+        }
+
+        // Helper method to add table header
+        private void AddTableHeader(Document document)
+        {
+            Paragraph header = new Paragraph()
+                .AddTabStops(new TabStop(200, TabAlignment.RIGHT)) // Adjust the tab stop based on your layout
+                .Add(new Tab()).Add("Date").AddTab()
+                .Add(new Tab()).Add("Particulars").AddTab()
+                .Add(new Tab()).Add("chqno").AddTab()
+                .Add(new Tab()).Add("debit").AddTab()
+                .Add(new Tab()).Add("credit").AddTab()
+                .Add(new Tab()).Add("bal")
+                .SetBold().SetFontSize(12);
+
+            document.Add(header);
+        }
+
+        // Helper method to add transaction details
+        private void AddTransactionDetails(Document document, string date, string particulars, string chqno, string debit, string credit)
+        {
+            Paragraph transaction = new Paragraph()
+                .AddTabStops(new TabStop(200, TabAlignment.RIGHT)) // Adjust the tab stop based on your layout
+                .Add(new Tab()).Add(date).AddTab()
+                .Add(new Tab()).Add(particulars).AddTab()
+                .Add(new Tab()).Add(chqno).AddTab()
+                .Add(new Tab()).Add(debit).AddTab()
+                .Add(new Tab()).Add(credit).AddTab()
+                .Add(new Tab()).Add("6527") // Assuming "bal" is static in this example
+                .SetFontSize(12);
+
+            document.Add(transaction);
+        }
+    }
+}
