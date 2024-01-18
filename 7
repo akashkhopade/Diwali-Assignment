@@ -1,0 +1,22 @@
+// Helper method to add table header using a Table
+private void AddTableHeader(Document document)
+{
+    // Assuming these are your desired column widths
+    float dateWidth = 60;
+    float particularsWidth = 100;
+    float chqnoWidth = 40;
+    float debitWidth = 40;
+    float creditWidth = 40;
+
+    Table headerTable = new Table(new float[] { dateWidth, particularsWidth, chqnoWidth, debitWidth, creditWidth });
+    headerTable.SetWidth(UnitValue.CreatePercentValue(100));
+    headerTable.SetBorder(Border.NO_BORDER);
+
+    headerTable.AddCell(new Cell().Add(new Paragraph("Date")).SetBold());
+    headerTable.AddCell(new Cell().Add(new Paragraph("Particulars")).SetBold());
+    headerTable.AddCell(new Cell().Add(new Paragraph("chqno")).SetBold());
+    headerTable.AddCell(new Cell().Add(new Paragraph("debit")).SetBold());
+    headerTable.AddCell(new Cell().Add(new Paragraph("credit")).SetBold());
+
+    document.Add(headerTable);
+}
