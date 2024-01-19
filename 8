@@ -1,0 +1,69 @@
+using System;
+using System.IO;
+
+namespace FileProcessingWebApp
+{
+    public partial class FileProcessor : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            string folderPath = Server.MapPath("~/Files"); // Specify your folder path
+
+            // Call the method to process files and count occurrences
+            ProcessFilesAndCount(folderPath, "specificString");
+        }
+
+        private void ProcessFilesAndCount(string folderPath, string searchString)
+        {
+            int totalCount = 0; // Initialize total count
+
+            if (Directory.Exists(folderPath))
+            {
+                string[] files = Directory.GetFiles(folderPath);
+
+                foreach (string filePath in files)
+                {
+                    string fileName = Path.GetFileName(filePath);
+                    int count = CountStringOccurrences(filePath, searchString);
+
+                    // Print the results for each file
+                    Response.Write($"{fileName}: Count of '{searchString}': {count}<br>");
+
+                    // Accumulate the count for total
+                    totalCount += count;
+                }
+
+                // Print the total count across all files
+                Response.Write($"Total Count of '{searchString}' in all files: {totalCount}<br>");
+            }
+            else
+            {
+                Response.Write("Folder not found.");
+            }
+        }
+
+        private int CountStringOccurrences(string filePath, string searchString)
+        {
+            int count = 0;
+
+            try
+            {
+                // Read all lines from the file
+                string[] lines = File.ReadAllLines(filePath);
+
+                // Iterate through each line and count occurrences of the specified string
+                foreach (string line in lines)
+                {
+                    count += (line.Split(new[] { searchString }, StringSplitOptions.None).Length - 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions that may occur during file processing
+                Response.Write($"Error processing file {filePath}: {ex.Message}<br>");
+            }
+
+            return count;
+        }
+    }
+}
