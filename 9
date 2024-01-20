@@ -1,0 +1,145 @@
+using System;
+using System.IO;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
+using iText.Kernel.Geom;
+using iText.Kernel.Pdf.Canvas.Draw;
+
+namespace BankStatementGenerator
+{
+    public class BankStatementGenerator
+    {
+        private const string OutputFolder = @"D:\Logs\Statements\";
+
+        public void GeneratePdf(int index)
+        {
+            string fileName = $"application_{index}.pdf";
+            string filePath = Path.Combine(OutputFolder, fileName);
+
+            // Create a PdfWriter object
+            using (PdfWriter writer = new PdfWriter(filePath))
+            {
+                // Create a PdfDocument object
+                using (PdfDocument pdf = new PdfDocument(writer))
+                {
+                    // Create a Document object
+                    Document document = new Document(pdf, PageSize.B4);
+
+                    // Set the left margin to ensure alignment
+                    document.SetMargins(50, 36, 36, 36);
+
+                    // Add header details
+                    AddHeaderDetails(document, "A/c name:", "tiruit technology");
+                    AddHeaderDetails(document, "Address: ", "hehwhw jsjwhwhw ghfhffhh hwhw ueieh fffffffff gggggg dddddddddd jjjjjjj jjjjj jjjjjjj jjjjjjjjjj");
+                    AddHeaderDetails(document, "Ac details:", "tirumala uat");
+                    AddHeaderDetails(document, "CBS ac no:", "62652266");
+                    AddHeaderDetails(document, "IFSC code:", "srcb00062");
+                    AddHeaderDetails(document, "Micr code:", "755477");
+                    AddHeaderDetails(document, "Print date: ", $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+
+                    // Add a line separator
+                    AddLineSeparator(document);
+
+                    // Add table header
+                    AddTableHeader(document);
+                    AddLineSeparator(document);
+
+                    for (int i = 0; i <= 20; i++)
+                    {
+                        AddTransactionDetails(document, "August", "by    open jjjjjj nnnnnnn bbbbbb", "0", "662.00", "6527", "664487");
+                    }
+
+                    // Add image
+                    AddImageToPdf(document, @"D:\Logs\pexels.jpg");
+
+                    document.Close();
+                }
+            }
+        }
+
+        private void AddHeaderDetails(Document document, params string[] values)
+        {
+            for (int i = 0; i < values.Length; i += 2)
+            {
+                document.Add(new Paragraph($"{values[i]} {values[i + 1]}").SetFontSize(12));
+            }
+        }
+
+        private void AddTableHeader(Document document)
+        {
+            float dateWidth = 60;
+            float particularsWidth = 80;
+            float chqnoWidth = 60;
+            float debitWidth = 60;
+            float creditWidth = 60;
+            float balWidth = 60;
+
+            Table headerTable = new Table(new float[] { dateWidth, particularsWidth, chqnoWidth, debitWidth, creditWidth, balWidth });
+            headerTable.SetWidth(UnitValue.CreatePercentValue(100));
+
+            headerTable.AddCell("Date").SetBold();
+            headerTable.AddCell("Particulars").SetBold();
+            headerTable.AddCell("chqno").SetBold();
+            headerTable.AddCell("debit").SetBold();
+            headerTable.AddCell("credit").SetBold();
+            headerTable.AddCell("bal").SetBold();
+
+            document.Add(headerTable);
+        }
+
+        private void AddTransactionDetails(Document document, string date, string particulars, string chqno, string debit, string credit, string bal)
+        {
+            float dateWidth = 60;
+            float particularsWidth = 80;
+            float chqnoWidth = 60;
+            float debitWidth = 60;
+            float creditWidth = 60;
+            float balWidth = 60;
+
+            Table transactionTable = new Table(new float[] { dateWidth, particularsWidth, chqnoWidth, debitWidth, creditWidth, balWidth });
+            transactionTable.SetWidth(UnitValue.CreatePercentValue(100));
+
+            transactionTable.AddCell($"{date.PadRight(15)}");
+            transactionTable.AddCell($"{particulars.PadRight(25)}");
+            transactionTable.AddCell($"{chqno.PadRight(10)}");
+            transactionTable.AddCell($"{debit.PadRight(10)}");
+            transactionTable.AddCell($"{credit.PadRight(10)}");
+            transactionTable.AddCell($"{bal.PadRight(10)}");
+
+            document.Add(transactionTable);
+        }
+
+        private void AddImageToPdf(Document document, string imagePath)
+        {
+            if (File.Exists(imagePath))
+            {
+                Image img = new Image(ImageDataFactory.Create(imagePath))
+                    .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                    .SetBorder(Border.NO_BORDER);
+
+                document.Add(img);
+            }
+        }
+
+        private void AddLineSeparator(Document document)
+        {
+            document.Add(new LineSeparator(new SolidLine(1)).SetMarginTop(10).SetMarginBottom(10));
+        }
+
+        public static void Main()
+        {
+            BankStatementGenerator generator = new BankStatementGenerator();
+
+            // Define the number of PDFs to generate
+            int numberOfPDFs = 300;
+
+            // Generate PDFs in a loop
+            for (int i = 0; i < numberOfPDFs; i++)
+            {
+                generator.GeneratePdf(i);
+            }
+        }
+    }
+}
