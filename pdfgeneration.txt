@@ -1,0 +1,162 @@
+public void GeneratePdf()
+        {
+            //loop added
+            
+                // Create a MemoryStream to hold the PDF
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    // Create a PdfWriter object
+                    using (PdfWriter writer = new PdfWriter(stream))
+                    {
+                        // Create a PdfDocument object
+                        // using (PdfDocument pdf = new PdfDocument(writer))
+                        using (PdfDocument pdf = new PdfDocument(writer))
+                        {
+                            // Create a Document object
+                            pdf.SetDefaultPageSize(new iText.Kernel.Geom.PageSize(iText.Kernel.Geom.PageSize.B4));
+                            Document document = new Document(pdf);
+
+                            // Set the left margin to ensure alignment
+                            document.SetMargins(50, 36, 36, 36);
+
+                            // Add header details
+                            AddHeaderDetails1(document, "A/c name:", "tiruit technology");
+                            AddHeaderDetails1(document, "Address: ", "hehwhw jsjwhwhw ghfhffhh hwhw ueieh fffffffff gggggg dddddddddd jjjjjjj jjjjj jjjjjjj jjjjjjjjjj");
+                            AddHeaderDetails1(document, "Ac details:", "tirumala uat");
+                            AddHeaderDetails1(document, "CBS ac no:", "62652266");
+                            AddHeaderDetails1(document, "IFSC code:", "srcb00062");
+                            AddHeaderDetails1(document, "Micr code:", "755477");
+                            //  AddAlignedText(document, $"From Date: 2024-07-01 to Date: 2023-02-05");
+                            AddHeaderDetails1(document, "Print date: ", $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+
+                            // Add table header
+
+                            AddLineSeparator2(document);
+                            // document.Add(new Paragraph("Date\tParticulars\tchqno\tdebit\tcredit\tbal"));
+                            // document.Add(new Paragraph("Date     Particulars      chqno     debit     credit   bal").SetFixedLeading(25));
+                            AddTableHeader1(document);
+                            AddLineSeparator(document);
+
+                            for (int i = 0; i <= 20; i++)
+                            {
+                                AddTransactionDetails1(document, "August", "by    open jjjjjj nnnnnnn bbbbbb", "0", "662.00", "6527", "664487");
+                            }
+                            AddImageToPdf(document, @"D:\Logs\pexels.jpg");
+                            document.Close();
+                            // Add transaction details (replace with your actual data)
+                            //  AddAlignedText(document, "Aug\tbyopen\t0\t662.00\t6527");
+                            // Add more transactions as needed
+
+                            // Save the PDF to the server or send it to the client
+                            string fileName = "BankStatement.pdf";
+                            //  File.WriteAllBytes(Server.MapPath(fileName), stream.ToArray());
+
+                            // Provide the PDF download link to the client
+                            //  File.WriteAllBytes(@"D:\Logs\Statements\application.pdf", stream.ToArray());
+                            File.WriteAllBytes($@"D:\Logs\Statements\application_{j}.pdf", stream.ToArray());
+                        }
+                    }
+                
+            }
+        }
+        
+
+             
+        protected void AddImageToPdf(Document document,string imagePath)
+        {
+            if(File.Exists(imagePath))
+            {
+                Image img = new Image(ImageDataFactory.Create(imagePath))
+                    .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                    .SetBorder(Border.NO_BORDER);
+                document.Add(img);
+            }
+        }
+        
+        private void AddTransactionDetails1(Document document, string date, string particulars, string chqno, string debit, string credit, string bal)
+        {
+
+
+            //if(document.GetRenderer().GetCurrentArea().GetBBox().GetBottom()< document.GetBottomMargin())
+            //{
+            //    document.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+            //    AddTableHeader1(document);
+            //}
+            
+           
+
+            float dateWidth = 40;
+            float particularsWidth = 80;
+            float chqnoWidth = 60;
+            float debitWidth = 60;
+            float creditWidth = 60;
+            float baltWidth = 60;
+
+
+
+            Table transactionTable = new Table(6);
+            transactionTable.SetWidth(UnitValue.CreatePercentValue(100));
+
+            transactionTable.AddCell(new Cell().Add(new Paragraph($"{date.PadRight(15)}").SetWidth(dateWidth)).SetBorder(Border.NO_BORDER));
+            transactionTable.AddCell(new Cell().Add(new Paragraph($"{particulars.PadRight(25)}").SetWidth(particularsWidth)).SetBorder(Border.NO_BORDER));
+            transactionTable.AddCell(new Cell().Add(new Paragraph($"{chqno.PadRight(10)}").SetWidth(chqnoWidth)).SetBorder(Border.NO_BORDER));
+            transactionTable.AddCell(new Cell().Add(new Paragraph($"{debit.PadRight(10)}").SetWidth(debitWidth)).SetBorder(Border.NO_BORDER));
+            transactionTable.AddCell(new Cell().Add(new Paragraph($"{credit.PadRight(10)}").SetWidth(creditWidth)).SetBorder(Border.NO_BORDER));
+            transactionTable.AddCell(new Cell().Add(new Paragraph($"{bal.PadRight(10)}").SetWidth(baltWidth)).SetBorder(Border.NO_BORDER));
+            // Adjust the line spacing
+            //    transactionTable.SetFixedLeading(lineHeight * 1.2f); // Adjust the multiplier as needed
+
+            document.Add(transactionTable);
+        }
+       
+       
+        private void AddTableHeader1(Document document)
+        {
+            // Assuming these are your desired column widths
+            float dateWidth = 60;
+            float particularsWidth = 80;
+            float chqnoWidth = 60;
+            float debitWidth = 60;
+            float creditWidth = 60;
+            float balWidth = 60;
+             
+                Table headerTable = new Table(new float[] { dateWidth, particularsWidth, chqnoWidth, debitWidth, creditWidth, balWidth });
+                headerTable.SetWidth(UnitValue.CreatePercentValue(100));
+                //    headerTable.SetBorder(Border.NO_BORDER);
+
+                headerTable.AddCell(new Cell().Add(new Paragraph("Date")).SetBold().SetBorder(Border.NO_BORDER));
+                headerTable.AddCell(new Cell().Add(new Paragraph("Particulars")).SetBold().SetBorder(Border.NO_BORDER));
+                headerTable.AddCell(new Cell().Add(new Paragraph("chqno")).SetBold().SetBorder(Border.NO_BORDER));
+                headerTable.AddCell(new Cell().Add(new Paragraph("debit")).SetBold().SetBorder(Border.NO_BORDER));
+                headerTable.AddCell(new Cell().Add(new Paragraph("credit")).SetBold().SetBorder(Border.NO_BORDER));
+                headerTable.AddCell(new Cell().Add(new Paragraph("bal")).SetBold().SetBorder(Border.NO_BORDER));
+                document.Add(headerTable);
+            
+
+        }
+                             
+        private void AddHeaderDetails1(Document document,params string[] values)
+        {
+            
+            Paragraph paragraph = new Paragraph();
+            for(int i=0;i<values.Length;i+=2)
+            {
+                Text labelText = new Text(values[i]).SetBold().SetFontSize(12);
+                Text valueText = new Text(values[i + 1]).SetFontSize(12);
+                paragraph
+                    .Add(new Paragraph().Add(labelText).SetWidth(120))
+                    .Add(new Paragraph().Add(valueText).SetWidth(120));
+            }
+            document.Add(paragraph);
+
+            
+        }
+        private void AddLineSeparator(Document document)
+        {
+            document.Add(new LineSeparator(new SolidLine(1)).SetMarginTop(10).SetMarginBottom(10));
+        }
+        private void AddLineSeparator2(Document document)
+        {
+            document.Add(new LineSeparator(new SolidLine(2)).SetMarginTop(10).SetMarginBottom(10));
+        }
+       
